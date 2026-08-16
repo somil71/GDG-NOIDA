@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingEl.style.display = 'none';
             renderFormList(forms);
         } catch (error) {
+            loadingEl.style.display = 'block';
             loadingEl.textContent = 'Error loading forms. Is the server running?';
         }
     }

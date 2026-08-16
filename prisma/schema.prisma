@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Form {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  schema      String       // JSON string representing the dynamic schema (e.g. fields)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  submissions Submission[]
+}
+
+model Submission {
+  id        String   @id @default(uuid())
+  formId    String
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  data      String   // JSON string representing the user's submitted data
+  files     String?  // JSON string representing uploaded file metadata/paths
+  createdAt DateTime @default(now())
+}

@@ -5,6 +5,7 @@ import formRoutes from './routes/formRoutes';
 import { globalLimiter } from './middlewares/rateLimiter';
 import { errorHandler } from './middlewares/errorHandler';
 import path from 'path';
+import { prisma } from './db';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -39,8 +40,30 @@ app.use('/api/forms', formRoutes);
 // Apply Global Error Handler
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Server is running on port ${port}`);
+
+  // Seed database if empty
+  try {
+    const count = await prisma.form.count();
+    if (count === 0) {
+      await prisma.form.create({
+        data: {
+          title: "GDG Noida - Event Feedback",
+          description: "We'd love to hear your thoughts on the event!",
+          schema: JSON.stringify([
+            { name: "overall_rating", type: "rating", required: true },
+            { name: "nps_score", type: "nps", required: true },
+            { name: "comments", type: "text", required: false },
+            { name: "attachments", type: "file", required: false }
+          ])
+        }
+      });
+      console.log("Database seeded with default form.");
+    }
+  } catch (err) {
+    console.error("Error seeding database:", err);
+  }
 });
 
 export default app; // export for testing
